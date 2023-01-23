@@ -91,17 +91,19 @@ function App() {
     <div className="App">
       <h1>Memory Game</h1>
       <h2>Number Of Turns: {turns}</h2>
-      <button onClick={() => setDifficulty(0)}>New Game</button>
       {
         (difficulty > 0) ?
           (!won) ?
-            <div className={`card-grid dif-${difficulty}`}>
-              {
-                cards.map(card => (
-                  <SingleCard key={card.id} handleChoice={handleChoice} flipped={card === choiceOne || card === choiceTwo || card.matched} card={card} disabled={disabled} />
-                ))
-              }
-            </div>
+            <>
+              <button onClick={() => setDifficulty(0)}>New Game</button>
+              <div className={`card-grid dif-${difficulty}`}>
+                {
+                  cards.map(card => (
+                    <SingleCard key={card.id} handleChoice={handleChoice} flipped={card === choiceOne || card === choiceTwo || card.matched} card={card} disabled={disabled} />
+                  ))
+                }
+              </div>
+            </>
             :
             <h1>Hurrayy, you won in {turns} turns!!!</h1>
           :
