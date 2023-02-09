@@ -18,33 +18,31 @@ const cardImages = [
 
 function App() {
 
-  const [cards, setCards] = useState([])
-  const [turns, setTurns] = useState(0)
-  const [choiceOne, setChoiceOne] = useState(null)
-  const [choiceTwo, setChoiceTwo] = useState(null)
-  const [disabled, setDisabled] = useState(false)
+  const [cards, setCards] = useState([]) // card deck to be played with
+  const [turns, setTurns] = useState(0) // tracks the number of turns
+  const [choiceOne, setChoiceOne] = useState(null) // denotes the first card chosen by user
+  const [choiceTwo, setChoiceTwo] = useState(null) // denotes the second card chosen by user
+  const [disabled, setDisabled] = useState(false) // to avoid multiple clicks from user which state is rendering
   const [won, setWon] = useState(false)
   const [difficulty, setDifficulty] = useState(0);
 
-  // shuffle cards
-  const shuffleCards = (diff) => {
 
-    // console.log(difficulty)
-    let size = cardImages.length - (2 * (3 - diff));
+  const shuffleCards = (difficulty) => {
+    let size = cardImages.length - (2 * (3 - difficulty)); // formula derived for deciding the number of cards to be played with
     let tempCards = cardImages.slice(0, size)
-    const shuffledCards = [...tempCards, ...tempCards]
-      .sort(() => Math.random() - 0.5) //random return 0 or 1 therefore it becomes -0.5 and 0.5 and sort function swaps if val>0 hence a randomly shuffled array is generated
-      .map((card) => ({ ...card, id: Math.random() })) //each card object is taken which initially just has {src:""} and an id is added so now object becomes {src:"", id:''}
 
-    setChoiceOne(null)
+    const shuffledCards = [...tempCards, ...tempCards] // each card should have a clone with which it can match
+      .sort(() => Math.random() - 0.5) //random return 0 or 1 therefore it becomes -0.5 and 0.5 and sort function swaps if val>0 hence a randomly shuffled array is generated
+      .map((card) => ({ ...card, id: Math.random() })) //each card object is taken which initially just has {src:"something", matched:false} and an id is added so now object becomes {src:"", id:''}
+
+    setChoiceOne(null) // initially user has made no choice
     setChoiceTwo(null)
-    setCards(shuffledCards)
+    setCards(shuffledCards) // card deck consists of the shuffled cards
     setTurns(0)
     setWon(false)
   }
 
-  //handle a choice
-  const handleChoice = (card) => {
+  const handleChoice = (card) => { // check is the user is making his first choice or second
     (choiceOne && card.id !== choiceOne.id) ? setChoiceTwo(card) : setChoiceOne(card)
   }
 
@@ -53,24 +51,27 @@ function App() {
     setChoiceOne(null)
     setChoiceTwo(null)
     setTurns(turns + 1)
-    setDisabled(false)
+    setDisabled(false) // user is allowed to click
   }
 
   //compare two selected cards
   useEffect(() => {
     if (choiceTwo) {
-      setDisabled(true)
+      setDisabled(true) // avoids further spam clicks from user until render is completed
+
       if (choiceTwo.src === choiceOne.src) {
         setCards(prevCards => {
           return prevCards.map(card => {
             if (card.src === choiceOne.src)
-              return { ...card, matched: true }
+              return { ...card, matched: true } // this card is matched
             else
               return card
           })
         })
       }
-      setTimeout(() => resetTurn(), 500)
+
+      setTimeout(() => resetTurn(), 500) // user can register his click once again
+
       let count = 0
       cards.map(card => {
         if (card.matched)
@@ -82,19 +83,19 @@ function App() {
     }
   }, [choiceTwo])
 
-  let handleDifficulty = (diff) => {
-    setDifficulty(diff)
-    shuffleCards(diff)
+  let handleDifficulty = (difficulty) => {
+    setDifficulty(difficulty)
+    shuffleCards(difficulty)
   }
 
   return (
     <div className="App">
       <h1>Memory Game</h1>
-      <h2>Number Of Turns: {turns}</h2>
       {
         (difficulty > 0) ?
           (!won) ?
             <>
+              <h2>Number Of Turns: {turns}</h2>
               <button onClick={() => setDifficulty(0)}>New Game</button>
               <div className={`card-grid dif-${difficulty}`}>
                 {
@@ -105,7 +106,10 @@ function App() {
               </div>
             </>
             :
-            <h1>Hurrayy, you won in {turns} turns!!!</h1>
+            <>
+              <h1>Hurrayy, you won in {turns} turns!!!</h1>
+              <button onClick={() => setDifficulty(0)}>New Game</button>
+            </>
           :
           <div className='difficulty'>
             <button onClick={() => handleDifficulty(1)}>Difficulty level: 1</button>
